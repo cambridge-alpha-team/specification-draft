@@ -27,7 +27,7 @@ public interface IConnection
 
   /**
    * Method to send a message. Always succeeds, or throws an exception.
-   * @see osc.Message
+   * @see osc.IMessage
    * @param message An instance of the {@link osc.IMessage} to send.
    */
   public void sendMessage(IMessage message) throws IOException;
@@ -39,7 +39,7 @@ public interface IConnection
    * parameters from the message to filter for.
    *
    * @param listener A class implementing {@link osc.IMessageListener}
-   * whose handleMessage(osc.Message) method will be called with the
+   * whose handleMessage(osc.IMessage) method will be called with the
    * message.
    */
   public void subscribe(IMessageListener listener);

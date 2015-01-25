@@ -1,2 +1,12 @@
+# Editor swap and backup files
 .*.swp
+*~
+
+# UML Diagrams
 diagrams/*.png
+
+# JavaDoc files
+*.html
+*.css
+package-list
+*.gif
