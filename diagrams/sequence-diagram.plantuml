@@ -1,0 +1,32 @@
+@startuml
+actor "User (blind)" as user
+participant "User interface" as ui
+control "Cubelets" as cubelets
+participant "Back-end" as backend
+participant "Sonic Pi server" as sonic
+
+group Example interaction
+
+  user -> ui    : User input (code) via keyboard
+  ui -> user    : Feedback via screen-reader
+  ui -> backend : Run code loop
+
+  backend -> sonic    : Activate first loop
+  activate sonic
+  user -> cubelets    : Modify first loop parameters
+  cubelets -> backend : Modify first loop parameters
+  backend -> sonic    : Send parameters
+
+  user -> ui          : Add another loop and switch to it
+  activate sonic
+  user -> cubelets    : Modify second loop parameters
+  cubelets -> backend : Modify second loop parameters
+  backend -> sonic    : Send parameters
+
+  user -> ui : Quit
+  deactivate sonic
+  deactivate sonic
+
+end
+
+@enduml

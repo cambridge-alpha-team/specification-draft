@@ -1,0 +1,83 @@
+@startuml
+
+/' I find shadows distracting! '/
+skinparam shadowing false
+
+skinparam packageStyle Rect
+
+class UI {
+  - Buffer[]
+
+  - save()
+  - run()
+  - stop()
+}
+
+note left : Methods represent buttons
+
+class Main {
+  - osc.Connection
+  - cubelets.Connection
+
+  + main(String args)
+}
+
+Main --> "1" UI: "Spawns"
+
+class MusicThread {
+  - status
+
+  + MusicThread(String code)
+  + stop()
+  + focus()
+  + unfocus()
+}
+
+UI   --o  "0..*" MusicThread : "Creates"
+
+class osc.Connection {
+  - "connection state"
+
+  + Connection(String host, int port)
+  + close()
+  + sendMessage(osc.Message message)
+  + subscribe(osc.MessageListener listener)
+  + unsubscribe(osc.MessageListener listener)
+}
+
+interface osc.MessageListener {
+  + handleMessage(osc.Message message)
+}
+
+Main --o "1" osc.Connection : "Has a"
+
+class osc.Message {
+  - "message state"
+
+  + setPath(String path)
+  + getPath()
+  + add(Object)
+  + Object[] listObjects()
+}
+
+MusicThread --|> "0..*" osc.Message : "Creates to send"
+
+class cubelets.Connection {
+  + close()
+  + getCubeletValues()
+}
+
+Main                --o  "1"    cubelets.Connection : "Has a"
+cubelets.Connection --|> "0..*" osc.Message     : "Creates to send"
+
+class "Sonic Pi Server (Ruby)" as sonic
+
+osc.Connection "1" -- "1" sonic : "Communicates"
+
+note on link : May be bi-directional
+
+class "Cubelets Server (NodeJS)" as cubelets
+
+cubelets.Connection " 1" -- "1" cubelets
+
+@enduml
