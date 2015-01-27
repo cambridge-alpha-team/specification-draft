@@ -12,8 +12,6 @@ class Main {
 
 /' Frontend {{{ '/
 class Frontend <<Thread>> {
-  - Buffer[]
-
   + run() /* Thread run */
   - saveAll() /* Button */
   - runLoop() /* Button */
