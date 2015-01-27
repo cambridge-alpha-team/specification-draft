@@ -60,7 +60,6 @@ class "Loop (Backend)" as LoopB {
   - List<Integer> parameters: get, set
 
   + Loop(String code)
-  + stop()
 }
 
 /' }}} '/

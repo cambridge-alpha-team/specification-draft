@@ -1,42 +1,41 @@
 class Main {
-  public main(String args);
+  public static void main(String[] args);
 }
 
 class Frontend extends Thread {
-  public run(); /* Thread run */
-  private saveAll(); /* Button */
-  private runLoop(); /* Button */
-  private stopAll(); /* Button */
+  public void run(); /* Thread run */
+  private void saveAll(); /* Button callback */
+  private void runLoop(); /* Button callback */
+  private void stopAll(); /* Button callback */
 }
 
 class Serialiser {
-  public load(Piece, Path);
-  public save(Piece, Path);
+  public Piece load(Path);
+  public void save(Piece, Path);
 }
 
 class Piece {
-  public List<Loop> loops;
-  public Loop active;
+  private List<Loop> loops; /* get, set */
+  private Loop active; /* get, set */
 }
 
 class Loop {
-  private name: get, set;
-  private source: get, set;
-  private List<Integer> parameters: get, set;
+  private name; /* get, set */
+  private source; /* get, set */
+  private List<Integer> parameters; /* get, set */
 
-  public Loop(String code);
-  public stop();
+  public Loop(String name, String source);
 }
 
 class Backend extends Thread {
   private osc.Connection;
   private cubelets.Connection;
 
-  public run(); /* Thread run */
+  public void run(); /* Thread run */
 }
 
 class MessageQueue /* Thread communication */ {
-  public add(Message);
+  public void add(Message m);
   public Message get();
 }
 
@@ -44,35 +43,35 @@ interface Message {
 }
 
 class UpdateLoopMessage implements Message {
-  private index: get, set;
-  private Loop;
+  private int index; /* get, set */
+  private Loop newLoop; /* get, set */
 }
 
-class SetActiveMessage implements Message {
-  private ActiveIndex;
+class SetActiveMessage implements Message  {
+  private int ActiveIndex; /* get, set */
 }
 
-class StopAllMessage implements Message {
+class StopAllMessage implements Message  {
 }
 
-class ParameterValues implements Message {
-  private List<Integer> values;
+class ParameterValues implements Message  {
+  private List<Integer> values; /* get, set */
 }
 
 class osc.Connection {
-  private "Connection state";
+  /* private Connection state; */
 
   public Connection(String host, int port);
-  public close();
-  public sendMessage(osc.Message message);
+  public void close();
+  public void sendMessage(osc.Message message);
 }
 
 class osc.Message {
-  private "Message state";
+  /* private Message state; */
 
-  public setPath(String path);
-  public getPath();
-  public add(Object);
+  public void setPath(String path);
+  public String getPath();
+  public void add(Object);
   public Object[] listObjects();
 }
 
@@ -81,6 +80,6 @@ class cubelets.Connection {
      * in the background */
 
   public Connect(host, port);
-  public close();
-  public getCubeletValues();
+  public void close();
+  public List<Integer> getCubeletValues();
 }
