@@ -1,3 +1,4 @@
+/' vim: set fdm=marker : '/
 @startuml
 
 /' I find shadows distracting! '/
@@ -5,35 +6,111 @@ skinparam shadowing false
 
 skinparam packageStyle Rect
 
-class UI {
-  - Buffer[]
-
-  - save()
-  - run()
-  - stop()
-}
-
-note left : Methods represent buttons
-
 class Main {
-  - osc.Connection
-  - cubelets.Connection
-
   + main(String args)
 }
 
-Main --> "1" UI: "Spawns"
+/' Frontend {{{ '/
+class Frontend <<Thread>> {
+  - Buffer[]
 
-class MusicThread {
-  - status
-
-  + MusicThread(String code)
-  + stop()
-  + focus()
-  + unfocus()
+  + run() /* Thread run */
+  - saveAll() /* Button */
+  - runLoop() /* Button */
+  - stopAll() /* Button */
 }
 
-UI   --o  "0..*" MusicThread : "Creates"
+class Serialiser {
+  + load(Piece, Path)
+  + save(Piece, Path)
+}
+
+class "Piece (Frontend)" as PieceF {
+  + List<Loop> loops
+  + Loop active
+}
+
+class "Loop (Frontend)" as LoopF {
+  - name: get, set
+  - source: get, set
+  - List<Integer> parameters: get, set
+
+  + Loop(String code)
+  + stop()
+}
+
+Frontend --> "static" Serialiser
+
+/' }}} '/
+
+/' Backend {{{ '/
+class Backend <<Thread>> {
+  - osc.Connection
+  - cubelets.Connection
+
+  + run() /* Thread run */
+}
+
+class "Piece (Backend)" as PieceB {
+  + List<Loop> loops
+  + Loop active
+}
+
+class "Loop (Backend)" as LoopB {
+  - name: get, set
+  - source: get, set
+  - List<Integer> parameters: get, set
+
+  + Loop(String code)
+  + stop()
+}
+
+/' }}} '/
+
+Main --> "1" Frontend : "Spawns"
+Main --> "1" Backend  : "Spawns"
+
+/' Messaging {{{ '/
+
+class MessageQueue <<Thread communication>> {
+  + add(Message)
+  + Message get()
+}
+
+interface Message {
+}
+
+class UpdateLoopMessage {
+  - index: get, set
+  - Loop
+}
+
+class SetActiveMessage {
+  - ActiveIndex
+}
+
+class StopAllMessage {
+}
+
+class ParameterValues {
+  - List<Integer> values
+}
+
+MessageQueue --> "0..*" Message
+Message      --* UpdateLoopMessage
+Message      --* SetActiveMessage
+Message      --* StopAllMessage
+Message      --* ParameterValues
+
+/' }}} '/
+
+Backend  --> "1"    PieceB
+Frontend --> "1"    PieceF
+PieceB    --> "0..*" LoopB
+PieceF    --> "0..*" LoopF
+
+Frontend --> "2"     MessageQueue
+Backend  --> "2"     MessageQueue
 
 class osc.Connection {
   - "connection state"
@@ -41,15 +118,15 @@ class osc.Connection {
   + Connection(String host, int port)
   + close()
   + sendMessage(osc.Message message)
-  + subscribe(osc.MessageListener listener)
-  + unsubscribe(osc.MessageListener listener)
 }
 
+/'
 interface osc.MessageListener {
   + handleMessage(osc.Message message)
 }
+'/
 
-Main --o "1" osc.Connection : "Has a"
+Backend --> "1" osc.Connection
 
 class osc.Message {
   - "message state"
@@ -60,21 +137,19 @@ class osc.Message {
   + Object[] listObjects()
 }
 
-MusicThread --|> "0..*" osc.Message : "Creates to send"
-
 class cubelets.Connection {
+  + Connect(host, port)
   + close()
   + getCubeletValues()
+    /* Polls for cubelet values
+     * in the background */
 }
 
-Main                --o  "1"    cubelets.Connection : "Has a"
-cubelets.Connection --|> "0..*" osc.Message     : "Creates to send"
+Backend --> "1" cubelets.Connection
 
 class "Sonic Pi Server (Ruby)" as sonic
 
-osc.Connection "1" -- "1" sonic : "Communicates"
-
-note on link : May be bi-directional
+osc.Connection "1" -- "1" sonic
 
 class "Cubelets Server (NodeJS)" as cubelets
 
