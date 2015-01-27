@@ -43,19 +43,19 @@ class MessageQueue /* Thread communication */ {
 interface Message {
 }
 
-class UpdateLoopMessage {
+class UpdateLoopMessage implements Message {
   private index: get, set;
   private Loop;
 }
 
-class SetActiveMessage {
+class SetActiveMessage implements Message {
   private ActiveIndex;
 }
 
-class StopAllMessage {
+class StopAllMessage implements Message {
 }
 
-class ParameterValues {
+class ParameterValues implements Message {
   private List<Integer> values;
 }
 
